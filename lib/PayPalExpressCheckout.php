@@ -67,13 +67,20 @@ class PayPalExpressCheckout extends PayPalRequest
         "logoimg","email","solutiontype","landingpage","channeltype","giropaysuccessurl",
         "giropaycancelurl","banktxnpendingurl","brandname","customerservicenumber","giftmessageenable",
         "giftreceiptenable","giftwrapenable","giftwrapname","giftwrapamount","buyeremailoptinenable",
-        "surveyenable","surveyquestion");
+        "surveyenable","surveyquestion","payerid","returnfmdetails","giftmessage",
+        "buyermarketingemail","surveychoiceselected","buttonsource","insuranceoptionselected",
+        "shippingoptionisdefault","shippingoptionamount","shippingoptionname","currencycode",
+        "offerinsuranceoption","no_shipping_option_details");
 
     private $_pattern_fields = array(
-        "paymentrequest_[0-9]+_(amt|currencycode|itemamt|shippingamt|insuranceamt|shipdiscamt|insuranceoptionoffered|handlingamt|taxamt|desc|custom|invnum|notifyurl|multishipping|notetext|transactionid|allowedpaymentmethod|paymentaction|paymentrequestid|paymentreason)",
+        "paymentrequest_[0-9]+_(amt|currencycode|itemamt|shippingamt|insuranceamt|shipdiscamt|insuranceoptionoffered|handlingamt|taxamt|desc|custom|invnum|notifyurl|multishipping|notetext|softdescriptor|transactionid|allowedpaymentmethod|paymentaction|paymentrequestid|paymentreason)",
         "paymentrequest_[0-9]+_(shiptoname,shiptostreet,shiptostreet2,shiptostate,shiptozip,shiptocountrycode,shiptophonenum)",
         "paymentrequest_[0-9]+_(name|desc|amt|number|qty|taxamt|itemweightvalue|itemweightunit|itemlengthvalue|itemlengthunit|itemwidthvalue|itemwidthunit|itemheightvalue|itemheightunit|itemurl|itemcategory)[0-9]+",
+        "paymentrequest_[0-9]+_(sellerid|sellerusername|sellerregistrationdate)",
+        "l_insuranceamount[0-9]+",
         "l_surveychoice[0-9]+",
+        "l_shippingoption(amount|isdefault|label|name)[0-9]+",
+        "l_taxamt[0-9]+",
     );
           
     /**
@@ -150,6 +157,41 @@ class PayPalExpressCheckout extends PayPalRequest
     }
 
     /**
+     * Do an express checkout
+     *
+     * Should be called when the order is being confirmed and completes the PayPal checkout
+     * 
+     * @param string $token     Token returned from GetExpressCheckout
+     * @param string $payerid   Payer ID return from GetExpressCheckout
+     * @return PayPalResponse   Response with billing agreement ID
+     */
+    public function doEC($token = null, $payerid = null) {
+
+        ($token ? $this->token = $token : null);
+        ($payerid ? $this->payerid = $payerid : null);
+        
+        $this->method = 'DoExpressCheckout';
+        return $this->_sendRequest();
+    }
+
+    /**
+     * Get express checkout details
+     *
+     * Should be called when a user returns from PayPal to your website
+     * 
+     * @param  string $token    Token returned from PayPal
+     * @return PayPalResponse   Response with user and shipping information  
+     */
+    public function getEC($token = null) {
+
+        ($token ? $this->token = $token : null);
+                
+        $this->method = 'GetExpressCheckout';
+        return $this->_sendRequest();
+
+    }
+
+    /**
      * Redirect to login page for buyer based on token
      * @param  string $token
      * @return void
@@ -168,15 +210,31 @@ class PayPalExpressCheckout extends PayPalRequest
 
     /**
      * Set an express checkout
+     *
+     * Should be called from the cart or from the billing step in checkout
+     * 
      * @param string $amount    Amount for transaction
      * @param string $returnurl Return URL after buyer is done on PayPal
      * @param string $cancelurl Cancel URL if buyer chooses to return
+     * @param string $callback  Callback URL for PayPal to retrieve shipping data
+     * @return PayPalResponse Response with token to redirect user to PayPal
      */
-    public function set($amt = false, $returnurl = false, $cancelurl = false) {
+    public function setEC($amt = null, $returnurl = null, $cancelurl = null, $callback = null) {
 
         ($amt ? $this->paymentrequest_0_amt = $amt : null);
         ($returnurl ? $this->returnurl = $returnurl : null);
         ($cancelurl ? $this->cancelurl = $cancelurl : null);
+
+        // Set call back and default (invalid) shipping method
+        // The shipping method will be overridden once PayPal gets results from the callback URL
+        if ($callback) {
+            $this->callback = $callback;
+            $this->callbackversion = 104;
+            $this->callbacktimeout = 3;
+            $this->l_shippingoptionisdefault0 = true;
+            $this->l_shippingoptionname0 = 'Unable to ship';
+            $this->l_shippingoptionamount0 = '0';
+        }
 
         $this->method = 'SetExpressCheckout';
         return $this->_sendRequest();
