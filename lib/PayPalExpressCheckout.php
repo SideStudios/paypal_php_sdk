@@ -12,7 +12,6 @@
  * @subpackage PayPalExpressCheckout
  */
 
- 
 /**
  * Builds and sends an PayPal Request.
  *
@@ -70,7 +69,7 @@ class PayPalExpressCheckout extends PayPalRequest
         "surveyenable","surveyquestion","payerid","returnfmdetails","giftmessage",
         "buyermarketingemail","surveychoiceselected","buttonsource","insuranceoptionselected",
         "shippingoptionisdefault","shippingoptionamount","shippingoptionname","currencycode",
-        "offerinsuranceoption","no_shipping_option_details");
+        "offerinsuranceoption","no_shipping_option_details", "token");
 
     private $_pattern_fields = array(
         "paymentrequest_[0-9]+_(amt|currencycode|itemamt|shippingamt|insuranceamt|shipdiscamt|insuranceoptionoffered|handlingamt|taxamt|desc|custom|invnum|notifyurl|multishipping|notetext|softdescriptor|transactionid|allowedpaymentmethod|paymentaction|paymentrequestid|paymentreason)",
@@ -122,10 +121,11 @@ class PayPalExpressCheckout extends PayPalRequest
         if (strlen($shiptocity) > 40) throw new PayPalException('Shipping address city cannot exceed 40 characters!');
         if (strlen($shiptozip) > 20) throw new PayPalException('Shipping address postal code/ZIP cannot exceed 20 characters!');
         if (strlen($shiptocountrycode) > 2) throw new PayPalException('Shipping address country must be a 2 character code!');
-        if ($shiptophonenumber && strlen($shiptophonenumber) > 20) throw new PayPalException('Shipping address phone number cannot exceed 20 characters!');
-        else if (is_null($shiptophonenumber)) unset($address['shiptophonenumber']);
+        if ($shiptophonenum && strlen($shiptophonenum) > 20) throw new PayPalException('Shipping address phone number cannot exceed 20 characters!');
+        else if (is_null($shiptophonenum)) unset($address['shiptophonenum']);
 
-        $this->_shipping_address = $address;
+        $this->_payment_fields = array_merge($this->_payment_fields, compact('shiptoname', 'shiptostreet', 'shiptocity', 'shiptostate', 'shiptozip', 'shiptocountrycode', 'shiptophonenum'));
+        $this->addroverride = 1;
     }
 
     /**
@@ -165,12 +165,12 @@ class PayPalExpressCheckout extends PayPalRequest
      * @param string $payerid   Payer ID return from GetExpressCheckout
      * @return PayPalResponse   Response with billing agreement ID
      */
-    public function doEC($token = null, $payerid = null) {
+    public function doECP($token = null, $payerid = null) {
 
         ($token ? $this->token = $token : null);
         ($payerid ? $this->payerid = $payerid : null);
         
-        $this->method = 'DoExpressCheckout';
+        $this->method = 'DoExpressCheckoutPayment';
         return $this->_sendRequest();
     }
 
@@ -182,11 +182,11 @@ class PayPalExpressCheckout extends PayPalRequest
      * @param  string $token    Token returned from PayPal
      * @return PayPalResponse   Response with user and shipping information  
      */
-    public function getEC($token = null) {
+    public function getECD($token = null) {
 
         ($token ? $this->token = $token : null);
                 
-        $this->method = 'GetExpressCheckout';
+        $this->method = 'GetExpressCheckoutDetails';
         return $this->_sendRequest();
 
     }
@@ -217,9 +217,10 @@ class PayPalExpressCheckout extends PayPalRequest
      * @param string $returnurl Return URL after buyer is done on PayPal
      * @param string $cancelurl Cancel URL if buyer chooses to return
      * @param string $callback  Callback URL for PayPal to retrieve shipping data
+     * @param string $maxamt    Maximum expected amount for this order (only if callback is specified)
      * @return PayPalResponse Response with token to redirect user to PayPal
      */
-    public function setEC($amt = null, $returnurl = null, $cancelurl = null, $callback = null) {
+    public function setEC($amt = null, $returnurl = null, $cancelurl = null, $callback = null, $maxamt = null) {
 
         ($amt ? $this->paymentrequest_0_amt = $amt : null);
         ($returnurl ? $this->returnurl = $returnurl : null);
@@ -234,6 +235,7 @@ class PayPalExpressCheckout extends PayPalRequest
             $this->l_shippingoptionisdefault0 = true;
             $this->l_shippingoptionname0 = 'Unable to ship';
             $this->l_shippingoptionamount0 = '0';
+            ($maxamt ? $this->maxamt = $maxamt : null);
         }
 
         $this->method = 'SetExpressCheckout';
@@ -328,10 +330,10 @@ class PayPalExpressCheckout extends PayPalRequest
         }
         // Add payment request fields
         foreach($this->_payment_fields as $key => $value) {
-            $this->_post_string .= "PAYMENTREQUEST_0_" . $key . "=" . urlencode($value) . "&";
+            $this->_post_string .= "PAYMENTREQUEST_0_" . strtoupper($key) . "=" . urlencode($value) . "&";
         }
         // Add custom fields
-        foreach ($this->_custom_fields as $key => $value) {
+        foreach($this->_custom_fields as $key => $value) {
             $this->_post_string .= "$key=" . urlencode($value) . "&";
         }
         $this->_post_string = rtrim($this->_post_string, "& ");
@@ -348,7 +350,7 @@ class PayPalExpressCheckout extends PayPalRequest
 class PayPalExpressCheckout_Response extends PayPalResponse
 {
 
-    private $_response_array = array(); // An array with the split response.
+    public $_response_array = array(); // An array with the split response.
 
     /**
      * Constructor. Parses the PayPal response string.
