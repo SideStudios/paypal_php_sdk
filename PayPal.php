@@ -5,10 +5,9 @@
  * @package PayPal
  */
 require dirname(__FILE__) . '/lib/shared/PayPalRequest.php';
-//require dirname(__FILE__) . '/lib/shared/PayPalTypes.php';
-//require dirname(__FILE__) . '/lib/shared/PayPalXMLResponse.php';
 require dirname(__FILE__) . '/lib/shared/PayPalResponse.php';
 require dirname(__FILE__) . '/lib/PayPalExpressCheckout.php';
+require dirname(__FILE__) . '/lib/PayPalClassic.php';
 
 /**
  * Exception class for PayPal PHP SDK.

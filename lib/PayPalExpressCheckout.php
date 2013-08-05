@@ -18,11 +18,8 @@
  * @package    PayPal
  * @subpackage PayPalExpressCheckout
  */
-class PayPalExpressCheckout extends PayPalRequest
-{
+class PayPalExpressCheckout extends PayPalRequest {
 
-    const LIVE_URL = 'https://api-3t.paypal.com/nvp';
-    const SANDBOX_URL = 'https://api-3t.sandbox.paypal.com/nvp';
     const LIVE_LOGIN_URL = 'https://www.paypal.com/cgi-bin/webscr';
     const SANDBOX_LOGIN_URL = 'https://www.sandbox.paypal.com/cgi-bin/webscr';
     
@@ -85,7 +82,7 @@ class PayPalExpressCheckout extends PayPalRequest
     /**
      * Alternative syntax for setting fields.
      *
-     * Usage: $sale->method = "echeck";
+     * Usage: $sale->method = "GetExpressCheckoutDetails";
      *
      * @param string $name
      * @param string $value
