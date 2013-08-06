@@ -13,17 +13,19 @@ Requirements
 Usage
 -----
 
-See below for basic usage examples. More examples can be found in the tests folder.
+See below for a basic usage example. More examples can be found in the tests folder.
       
 Express Checkout Example:
-    <?php
-    require_once 'paypal_php_sdk/PayPal.php'; 
-    define("PAYPAL_API_USERNAME", "your API username");
-    define("PAYPAL_API_PASSWORD", "your API password");
-    define("PAYPAL_API_SIGNATURE", "your API signature");
-    define("PAYPAL_SANDBOX", true);
-    $paypal = new PayPalExpressCheckout;
-    $response = $paypal->setEC('45.95', 'http://example.com/checkout/review/', 'http://example.com/cart/');
-    if ($response->status == 'Success') $checkoutToken = $response->token;
-    ?>
+
+```
+<?php
+require_once 'paypal_php_sdk/PayPal.php'; 
+define("PAYPAL_API_USERNAME", "your API username");
+define("PAYPAL_API_PASSWORD", "your API password");
+define("PAYPAL_API_SIGNATURE", "your API signature");
+define("PAYPAL_SANDBOX", true);
+$paypal = new PayPalExpressCheckout;
+$response = $paypal->setEC('45.95', 'http://example.com/checkout/review/', 'http://example.com/cart/');
+if ($response->status == 'Success') $checkoutToken = $response->token;
+?>
     
