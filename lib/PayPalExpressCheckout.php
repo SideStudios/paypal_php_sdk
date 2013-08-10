@@ -339,6 +339,54 @@ class PayPalExpressCheckout extends PayPalRequest {
 	}
 
 	/**
+	 * Set an individual payment field name/value pair.
+	 *
+	 * @param string $name
+	 * @param string $value
+	 */
+	public function setPaymentField($name, $value)
+	{
+		if ($this->verify_fields) {
+			if (in_array($name, $this->_string_fields)) {
+				$this->_payment_fields[$name] = $value;
+			} else {
+				foreach($this->_pattern_fields as $pattern) {
+					if (preg_match("/" . $pattern . "/", $name)) {
+						$this->_payment_fields[$name] = $value;
+						return;
+					}
+				}
+				throw new PayPalException("Error: no field $name exists in the PayPal API.");
+			}
+		} else {
+			$this->_payment_fields[$name] = $value;
+		}
+	}
+
+	/**
+	 * Quickly set multiple payment fields.
+	 *
+	 * @param array $fields Takes an array or object.
+	 */
+	public function setPaymentFields($fields)
+	{
+		$array = (array)$fields;
+		foreach ($array as $key => $value) {
+			$this->setPaymentField($key, $value);
+		}
+	}
+	
+	/**
+	 * Unset a payment field.
+	 *
+	 * @param string $name Field to unset.
+	 */
+	public function unsetPaymentField($name)
+	{
+		unset($this->_payment_fields[$name]);
+	}
+
+	/**
 	 * @return string
 	 */
 	protected function _getPostUrl()
