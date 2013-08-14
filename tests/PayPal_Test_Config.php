@@ -6,9 +6,9 @@
 /**
  * Enter your test account credentials to run tests against sandbox.
  */
-define("PAYPAL_API_USERNAME", "foxxyz_api1.gmail.com");
-define("PAYPAL_API_PASSWORD", "1375208217");
-define("PAYPAL_API_SIGNATURE", "AXdg-8KGX4KRN.WbIvoGaAtcQMGdARPdf5bCoYaeU6TrNeUT1EQnVDuF");
+define("PAYPAL_API_USERNAME", "");
+define("PAYPAL_API_PASSWORD", "");
+define("PAYPAL_API_SIGNATURE", "");
 define("PAYPAL_SANDBOX", true);
 
 
