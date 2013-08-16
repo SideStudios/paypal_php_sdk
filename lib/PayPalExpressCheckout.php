@@ -167,15 +167,16 @@ class PayPalExpressCheckout extends PayPalRequest {
 	 * @param string  $shippingoptionlabel     Label for shipping option
 	 * @param string  $shippingoptionamount    Shipping amount for this option
 	 * @param boolean $shippingoptionisdefault Whether or not to set this option as the default
+	 * @param string  $taxamt				   Tax amount for this shipping option
 	 */
-	public function addShippingOption($shippingoptionname, $shippingoptionlabel, $shippingoptionamount, $shippingoptionisdefault = false) {
+	public function addShippingOption($shippingoptionname, $shippingoptionlabel, $shippingoptionamount, $shippingoptionisdefault = false, $taxamt) {
 
 		// Validate fields
 		if (strlen($shippingoptionname) > 50) throw new PayPalException('Shipping option name cannot exceed 50 characters!');
 		if (strlen($shippingoptionlabel) > 50) throw new PayPalException('Shipping option label cannot exceed 50 characters!');
 		$shippingoptionisdefault = $shippingoptionisdefault ? 'true' : 'false';
 
-		$this->_shipping_options[] = compact('shippingoptionname', 'shippingoptionlabel', 'shippingoptionamount', 'shippingoptionisdefault');
+		$this->_shipping_options[] = compact('shippingoptionname', 'shippingoptionlabel', 'shippingoptionamount', 'shippingoptionisdefault', 'taxamt');
 
 	}
 
