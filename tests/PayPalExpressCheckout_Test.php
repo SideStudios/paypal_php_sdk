@@ -97,15 +97,17 @@ class PayPalExpressCheckout_Sandbox_Test extends PHPUnit_Framework_TestCase
 
         $sale = new PayPalExpressCheckout;
 
-        $sale->addShippingOption('GND', 'Fed-Ex Ground', '9.95');
-        $sale->addShippingOption('AIR', 'Fed-Ex Air', '23.95');
+        $sale->addShippingOption('GND', 'Fed-Ex Ground', '9.95', true, '1.05');
+        $sale->addShippingOption('AIR', 'Fed-Ex Air', '23.95', false, '2.05');
 
         $response = $sale->callbackResponse();
 
         $this->assertContains('CURRENCYCODE=USD', $response);
         $this->assertContains('METHOD=CallbackResponse', $response);
         $this->assertContains('L_SHIPPINGOPTIONNAME0=GND', $response);
+        $this->assertContains('L_SHIPPINGOPTIONISDEFAULT0=true', $response);
         $this->assertContains('L_SHIPPINGOPTIONNAME1=AIR', $response);
+        $this->assertContains('L_TAXAMT0=1.05', $response);
         $this->assertNotContains('NO_SHIPPING_OPTION_DETAILS', $response);
 
     }

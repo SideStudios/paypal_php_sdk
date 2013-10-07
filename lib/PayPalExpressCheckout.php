@@ -280,7 +280,7 @@ class PayPalExpressCheckout extends PayPalRequest {
 		if ($callback) {
 			$this->callback = $callback;
 			$this->callbackversion = 104;
-			$this->callbacktimeout = 3;
+			$this->callbacktimeout = 6;
 			$this->l_shippingoptionisdefault0 = true;
 			$this->l_shippingoptionname0 = 'Unable to ship';
 			$this->l_shippingoptionamount0 = '0';
