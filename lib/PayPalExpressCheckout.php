@@ -199,6 +199,7 @@ class PayPalExpressCheckout extends PayPalRequest {
 		
 		if (!$this->_shipping_options) $this->no_shipping_option_details = 1;
 		if (empty($this->_post_fields['currencycode'])) $this->currencycode = 'USD';
+		$this->unsetField('version');
 		
 		$this->_setPostString();
 		return $this->_post_string;
