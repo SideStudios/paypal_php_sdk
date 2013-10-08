@@ -142,7 +142,7 @@ class PayPalExpressCheckout extends PayPalRequest {
 	 * @param string $itemurl
 	 * @param string $itemcategory
 	 */
-	public function addLineItem($number, $name, $desc, $qty, $amt, $taxamt, $itemurl, $itemcategory = 'Physical')
+	public function addLineItem($number, $name, $desc, $qty, $amt, $taxamt, $itemurl = null, $itemcategory = 'Physical')
 	{
 		$this->_additional_line_items[] = compact('number', 'name', 'desc', 'qty', 'amt', 'taxamt', 'itemurl', 'itemcategory');
 	}
