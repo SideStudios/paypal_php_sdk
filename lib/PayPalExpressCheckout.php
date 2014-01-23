@@ -152,10 +152,11 @@ class PayPalExpressCheckout extends PayPalRequest {
 	 * @param string $itemamt     Total amount for items
 	 * @param string $shippingamt Total shipping amount
 	 * @param string $taxamt      Total tax amount
+	 * @param string $invnum 	  Invoice number
 	 */
-	public function addOrder($itemamt = null, $shippingamt = null, $taxamt = null)
+	public function addOrder($itemamt = null, $shippingamt = null, $taxamt = null, $invnum = null)
 	{
-		$this->_payment_fields = array_merge($this->_payment_fields, compact('itemamt', 'shippingamt', 'taxamt'));
+		$this->_payment_fields = array_merge($this->_payment_fields, compact('itemamt', 'shippingamt', 'taxamt', 'invnum'));
 	}
 
 	/**
