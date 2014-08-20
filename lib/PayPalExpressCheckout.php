@@ -4,7 +4,7 @@
  *
  * Note: To send requests to the live gateway, either define this:
  * define("PAYPAL_SANDBOX", false);
- *   -- OR --
+ *   -- OR -- 
  * $sale = new PayPal;
  * $sale->setSandbox(false);
  *
@@ -22,13 +22,13 @@ class PayPalExpressCheckout extends PayPalRequest {
 
 	const LIVE_LOGIN_URL = 'https://www.paypal.com/cgi-bin/webscr';
 	const SANDBOX_LOGIN_URL = 'https://www.sandbox.paypal.com/cgi-bin/webscr';
-
+	
 	/**
-	 * Holds all the default name/values that will be posted in the request.
+	 * Holds all the default name/values that will be posted in the request. 
 	 * Default values are provided for best practice fields.
 	 */
 	protected $_post_fields = array(
-		"version" => "104",
+		"version" => "104", 
 		);
 
 	/**
@@ -45,7 +45,7 @@ class PayPalExpressCheckout extends PayPalRequest {
 	 * Used for shipping option fields
 	 */
 	private $_shipping_options = array();
-
+	
 	/**
 	 * Only used if merchant wants to send custom fields.
 	 */
@@ -56,7 +56,7 @@ class PayPalExpressCheckout extends PayPalRequest {
 	 * Set to false to skip this check.
 	 */
 	public $verify_fields = true;
-
+	
 	/**
 	 * A list of all fields in the API.
 	 * Used to warn user if they try to set a field not offered in the API.
@@ -83,7 +83,7 @@ class PayPalExpressCheckout extends PayPalRequest {
 		"l_shippingoption(amount|isdefault|label|name)[0-9]+",
 		"l_taxamt[0-9]+",
 	);
-
+		  
 	/**
 	 * Alternative syntax for setting fields.
 	 *
@@ -92,7 +92,7 @@ class PayPalExpressCheckout extends PayPalRequest {
 	 * @param string $name
 	 * @param string $value
 	 */
-	public function __set($name, $value)
+	public function __set($name, $value) 
 	{
 		$this->setField($name, $value);
 	}
@@ -132,7 +132,7 @@ class PayPalExpressCheckout extends PayPalRequest {
 
 	/**
 	 * Add a line item.
-	 *
+	 * 
 	 * @param string $number
 	 * @param string $name
 	 * @param string $desc
@@ -163,7 +163,7 @@ class PayPalExpressCheckout extends PayPalRequest {
 	 * Add shipping option (for callbacks)
 	 *
 	 * If no shipping options are added, respondToCallback() will set NO_SHIPPING_OPTION_DETAILS
-	 *
+	 * 
 	 * @param string  $shippingoptionname      Internal/system name for shipping option
 	 * @param string  $shippingoptionlabel     Label for shipping option
 	 * @param string  $shippingoptionamount    Shipping amount for this option
@@ -197,11 +197,11 @@ class PayPalExpressCheckout extends PayPalRequest {
 	public function callbackResponse() {
 
 		$this->method = 'CallbackResponse';
-
+		
 		if (!$this->_shipping_options) $this->no_shipping_option_details = 1;
 		if (empty($this->_post_fields['currencycode'])) $this->currencycode = 'USD';
 		$this->unsetField('version');
-
+		
 		$this->_setPostString();
 		return $this->_post_string;
 
@@ -211,7 +211,7 @@ class PayPalExpressCheckout extends PayPalRequest {
 	 * Do an express checkout
 	 *
 	 * Should be called when the order is being confirmed and completes the PayPal checkout
-	 *
+	 * 
 	 * @param string $token     Token returned from GetExpressCheckout
 	 * @param string $payerid   Payer ID return from GetExpressCheckout
 	 * @return PayPalResponse   Response with billing agreement ID
@@ -220,7 +220,7 @@ class PayPalExpressCheckout extends PayPalRequest {
 
 		($token ? $this->token = $token : null);
 		($payerid ? $this->payerid = $payerid : null);
-
+		
 		$this->method = 'DoExpressCheckoutPayment';
 		return $this->_sendRequest();
 	}
@@ -229,14 +229,14 @@ class PayPalExpressCheckout extends PayPalRequest {
 	 * Get express checkout details
 	 *
 	 * Should be called when a user returns from PayPal to your website
-	 *
+	 * 
 	 * @param  string $token    Token returned from PayPal
-	 * @return PayPalResponse   Response with user and shipping information
+	 * @return PayPalResponse   Response with user and shipping information  
 	 */
 	public function getECD($token = null) {
 
 		($token ? $this->token = $token : null);
-
+				
 		$this->method = 'GetExpressCheckoutDetails';
 		return $this->_sendRequest();
 
@@ -252,7 +252,7 @@ class PayPalExpressCheckout extends PayPalRequest {
 		if ($this->_sandbox) $url = self::SANDBOX_LOGIN_URL;
 		else $url = self::LIVE_LOGIN_URL;
 
-		$url .= '?cmd=_express-checkout-mobile&token=' . $token;
+		$url .= '?cmd=_express-checkout&token=' . $token;
 
 		header('Location:' . $url);
 		die();
@@ -263,7 +263,7 @@ class PayPalExpressCheckout extends PayPalRequest {
 	 * Set an express checkout
 	 *
 	 * Should be called from the cart or from the billing step in checkout
-	 *
+	 * 
 	 * @param string $amount    Amount for transaction
 	 * @param string $returnurl Return URL after buyer is done on PayPal
 	 * @param string $cancelurl Cancel URL if buyer chooses to return
@@ -378,7 +378,7 @@ class PayPalExpressCheckout extends PayPalRequest {
 			$this->setPaymentField($key, $value);
 		}
 	}
-
+	
 	/**
 	 * Unset a payment field.
 	 *
@@ -401,7 +401,7 @@ class PayPalExpressCheckout extends PayPalRequest {
 	 *
 	 *
 	 * @param string $response
-	 *
+	 * 
 	 * @return PayPalExpressCheckout_Response
 	 */
 	protected function _handleResponse($response)
@@ -414,7 +414,7 @@ class PayPalExpressCheckout extends PayPalRequest {
 	 */
 	protected function _setPostString()
 	{
-
+		
 		if ($this->_post_fields['method'] != 'CallbackResponse') {
 			$this->_post_fields['USER'] = $this->_api_username;
 			$this->_post_fields['PWD'] = $this->_api_password;
@@ -483,7 +483,7 @@ class PayPalExpressCheckout_Response extends PayPalResponse {
 				}
 				else $this->{$key} = $value;
 			}
-
+			
 		} else {
 			$this->status = 'Failure';
 			$this->errors[] = array('errorcode' => 0, 'shortmessage' => 'Error connecting to PayPal', 'longmessage' => 'Error connecting to PayPal');
@@ -513,7 +513,7 @@ class PayPalCallback extends PayPalResponse {
 		foreach($request as $key => $value) {
 			$this->{strtolower($key)} = $value;
 		}
-
+		
 	}
 
 }
