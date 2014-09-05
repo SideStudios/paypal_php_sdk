@@ -9,31 +9,31 @@ abstract class PayPalRequest {
 
 	const LIVE_URL = 'https://api-3t.paypal.com/nvp';
 	const SANDBOX_URL = 'https://api-3t.sandbox.paypal.com/nvp';
-	
+
 	protected $_api_username;
 	protected $_api_password;
 	protected $_api_signature;
-	protected $_post_string; 
+	protected $_post_string;
 	public $VERIFY_PEER = false; // Set to false if getting connection errors.
 	protected $_sandbox = true;
 	protected $_log_file = false;
-	
+
 	/**
 	 * Set the _post_string
 	 */
 	abstract protected function _setPostString();
-	
+
 	/**
 	 * Handle the response string
 	 */
 	abstract protected function _handleResponse($string);
-	
+
 	/**
 	 * Get the post url. We need this because until 5.3 you
 	 * you could not access child constants in a parent class.
 	 */
 	abstract protected function _getPostUrl();
-	
+
 	/**
 	 * Constructor.
 	 *
@@ -59,7 +59,7 @@ abstract class PayPalRequest {
 	{
 		$this->_sandbox = $bool;
 	}
-	
+
 	/**
 	 * Set a log file.
 	 *
@@ -69,7 +69,7 @@ abstract class PayPalRequest {
 	{
 		$this->_log_file = $filepath;
 	}
-	
+
 	/**
 	 * Return the post string.
 	 *
@@ -79,7 +79,7 @@ abstract class PayPalRequest {
 	{
 		return $this->_post_string;
 	}
-	
+
 	/**
 	 * Posts the request to PayPal & returns response.
 	 *
@@ -100,23 +100,23 @@ abstract class PayPalRequest {
 		} else {
 			curl_setopt($curl_request, CURLOPT_SSL_VERIFYPEER, false);
 		}
-		
+
 		if (preg_match('/xml/',$post_url)) {
 			curl_setopt($curl_request, CURLOPT_HTTPHEADER, Array("Content-Type: text/xml"));
 		}
-		
+
 		$response = curl_exec($curl_request);
-		
+
 		if ($this->_log_file) {
-		
+
 			if ($curl_error = curl_error($curl_request)) {
 				file_put_contents($this->_log_file, "----CURL ERROR----\n$curl_error\n\n", FILE_APPEND);
 			}
-			
+
 			file_put_contents($this->_log_file, "----Response----\n$response\n\n", FILE_APPEND);
 		}
 		curl_close($curl_request);
-		
+
 		return $this->_handleResponse($response);
 	}
 
