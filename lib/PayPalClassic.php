@@ -4,7 +4,7 @@
  *
  * Note: To send requests to the live gateway, either define this:
  * define("PAYPAL_SANDBOX", false);
- *   -- OR -- 
+ *   -- OR --
  * $sale = new PayPal;
  * $sale->setSandbox(false);
  *
@@ -19,13 +19,13 @@
  * @subpackage PayPalClassic
  */
 class PayPalClassic extends PayPalRequest {
-    
+
     /**
-     * Holds all the default name/values that will be posted in the request. 
+     * Holds all the default name/values that will be posted in the request.
      * Default values are provided for best practice fields.
      */
     protected $_post_fields = array(
-        "version" => "104", 
+        "version" => "104",
         );
 
     /**
@@ -33,7 +33,7 @@ class PayPalClassic extends PayPalRequest {
      * Set to false to skip this check.
      */
     public $verify_fields = true;
-    
+
     /**
      * A list of all fields in the API.
      * Used to warn user if they try to set a field not offered in the API.
@@ -44,7 +44,7 @@ class PayPalClassic extends PayPalRequest {
         "shiptocity","shiptostate","shiptozip","shiptocountry","shiptophonenum","completetype","invnum",
         "softdescriptor","storeid","terminalid","payerid","invoiceid","refundtype","retryuntil","refundsource",
         "merchantstoredetails","refundadvice","refunditemdetails");
-          
+
     /**
      * Alternative syntax for setting fields.
      *
@@ -53,7 +53,7 @@ class PayPalClassic extends PayPalRequest {
      * @param string $name
      * @param string $value
      */
-    public function __set($name, $value) 
+    public function __set($name, $value)
     {
         $this->setField($name, $value);
     }
@@ -106,7 +106,7 @@ class PayPalClassic extends PayPalRequest {
      * Authorize a payment
      *
      * Should be called to authorize an existing transaction
-     * 
+     *
      * @param string $transactionid Existing payment transaction ID
      * @param string $amt           Amount to authorize
      * @return PayPalResponse       Response with transaction ID
@@ -115,7 +115,7 @@ class PayPalClassic extends PayPalRequest {
 
         ($transactionid ? $this->transactionid = $transactionid : null);
         ($amt ? $this->amt = $amt : null);
-        
+
         $this->method = 'DoAuthorization';
         return $this->_sendRequest();
     }
@@ -124,7 +124,7 @@ class PayPalClassic extends PayPalRequest {
      * Capture a payment
      *
      * Should be called to capture an existing transaction
-     * 
+     *
      * @param string $authorizationid   Existing authorized transaction ID
      * @param string $amt               Amount to authorize
      * @param string $completeType      Whether or not this is the last capture [Complete|NotComplete]
@@ -135,8 +135,26 @@ class PayPalClassic extends PayPalRequest {
         ($authorizationid ? $this->authorizationid = $authorizationid : null);
         ($amt ? $this->amt = $amt : null);
         ($completetype ? $this->completetype = $completetype : null);
-        
+
         $this->method = 'DoCapture';
+        return $this->_sendRequest();
+    }
+
+    /**
+     * Reauthorize a payment
+     *
+     * Should be called to reauthorize an existing transaction
+     *
+     * @param string $authorizationid Existing payment transaction ID
+     * @param string $amt           Amount to reauthorize
+     * @return PayPalResponse       Response with transaction ID
+     */
+    public function reauthorize($authorizationid = null, $amt = null) {
+
+        ($authorizationid ? $this->authorizationid = $authorizationid : null);
+        ($amt ? $this->amt = $amt : null);
+
+        $this->method = 'DoReauthorization';
         return $this->_sendRequest();
     }
 
@@ -144,7 +162,7 @@ class PayPalClassic extends PayPalRequest {
      * Refund a payment
      *
      * Should be called to refund a captured transaction
-     * 
+     *
      * @param string $authorizationid   Existing authorized transaction ID
      * @param string $refundType        Whether or not this is a full or partial refund [Full|Partial|ExternalDispute|Other]
      * @param string $amt               Amount to refund (required only if $refundType set to 'Partial')
@@ -155,7 +173,7 @@ class PayPalClassic extends PayPalRequest {
         ($transactionid ? $this->transactionid = $transactionid : null);
         ($refundtype ? $this->refundtype = $refundtype : null);
         ($amt ? $this->amt = $amt : null);
-        
+
         $this->method = 'RefundTransaction';
         return $this->_sendRequest();
     }
@@ -170,7 +188,7 @@ class PayPalClassic extends PayPalRequest {
     {
         if ($this->verify_fields && !in_array($name, $this->_string_fields)) throw new PayPalException("Error: no field $name exists in the PayPal API.");
         $this->_post_fields[$name] = $value;
-        
+
     }
 
     /**
@@ -200,14 +218,14 @@ class PayPalClassic extends PayPalRequest {
      * Void a payment
      *
      * Should be called to void an authorized transaction
-     * 
+     *
      * @param string $authorizationid   Existing authorized transaction ID
      * @return PayPalResponse           Response
      */
     public function void($authorizationid = null) {
 
         ($authorizationid ? $this->authorizationid = $authorizationid : null);
-        
+
         $this->method = 'DoVoid';
         return $this->_sendRequest();
     }
@@ -224,7 +242,7 @@ class PayPalClassic extends PayPalRequest {
      *
      *
      * @param string $response
-     * 
+     *
      * @return PayPalClassic_Response
      */
     protected function _handleResponse($response)
@@ -283,7 +301,7 @@ class PayPalClassic_Response extends PayPalResponse
                 }
                 else $this->{$key} = $value;
             }
-            
+
         } else {
             $this->status = 'Failure';
             $this->errors[] = array('errorcode' => 0, 'shortmessage' => 'Error connecting to PayPal', 'longmessage' => 'Error connecting to PayPal');
